@@ -1,0 +1,16 @@
+{
+    "websites" : {
+        "qq" : {
+            "keywords" : "qq.com",
+            "res_filename" : "qq.csv"
+        },
+        "douyin" : {
+            "keywords" : "douyin.com",
+            "res_filename" : "douyin.csv"
+        },
+        "weibo" : {
+            "keywords" : "weibo.com",
+            "res_filename" : "weibo.csv"
+        }
+    }
+}
