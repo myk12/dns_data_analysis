@@ -5,12 +5,38 @@
             "res_filename" : "qq.csv"
         },
         "douyin" : {
-            "keywords" : "douyin.com",
+            "keywords" : "douyin",
             "res_filename" : "douyin.csv"
         },
         "weibo" : {
-            "keywords" : "weibo.com",
+            "keywords" : "weibo",
             "res_filename" : "weibo.csv"
+        },
+        "kuaishou" : {
+            "keywords" : "kuaishou",
+            "res_filename" : "kuaishou.csv"
+        },
+        "douban" : {
+            "keywords" : "douban",
+            "res_filename" : "douban.csv"
+        },
+        "bilibili" : {
+            "keywords" : "bilibili",
+            "res_filename" : "bilibili.csv"
+        },
+        "zhihu" : {
+            "keywords" : "zhihu",
+            "res_filename" : "zhihu.csv"
+        },
+        "xiaohongshu" : {
+            "keywords" : "xiaohongshu",
+            "res_filename" : "xiaohongshu.csv"
+        },
+        "hupu" : {
+            "keywords" : "hupu",
+            "res_filename" : "hupu.csv"
         }
-    }
+    },
+    "raw_data_dir" : "./data/",
+    "res_data_dir" : "./result/"
 }

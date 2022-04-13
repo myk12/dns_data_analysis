@@ -1,5 +1,6 @@
 import os
 import gzip
+from pydoc import resolve
 import pandas as pd
 import json
 import re
@@ -27,19 +28,20 @@ class preprocessing:
                 self.filenames_dict[website] = file_name
 
                 #create file to save data
-                fd = open(file_name, "w")
-                fd.write("date,domain_name\n")
-                fd.close()
+                with open(file_name, "w") as csv_fd:
+                    csv_fd.write("date,domain_name\n")
 
 
     def process_items(self, item):
-        item_conponents = item.decode().split("|")
-        domain_name = item_conponents[1]
+        item_components = item.decode().split("|")
+
+        domain_name = item_components[1]
+        resolve_time = item_components[2]
 
         for website, name in self.keywords_dict.items():
             if name in domain_name:
                 it = {}
-                it["date"] = item_conponents[2]
+                it["date"] = resolve_time[0:10]
                 it["domain_name"] = domain_name
                 
                 self.dataframes_dict[website] = self.dataframes_dict[website].append(pd.Series(it), ignore_index=True)
