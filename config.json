@@ -1,5 +1,9 @@
 {
     "websites" : {
+        "weixin" : {
+            "keywords" : "weixin.qq.com",
+            "res_filename" : "weixin.csv"
+        },
         "qq" : {
             "keywords" : "qq.com",
             "res_filename" : "qq.csv"
@@ -38,5 +42,6 @@
         }
     },
     "raw_data_dir" : "./data/",
-    "res_data_dir" : "./result/"
+    "res_data_dir" : "./result/",
+    "stat_res_filename" : "statistic.csv"
 }

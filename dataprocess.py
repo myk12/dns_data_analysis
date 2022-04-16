@@ -46,6 +46,9 @@ class preprocessing:
                 
                 self.dataframes_dict[website] = self.dataframes_dict[website].append(pd.Series(it), ignore_index=True)
 
+                # If the match condition is met, exit
+                break
+
 
     def get_compressed_data(self, filename):
         #unzip file and read
