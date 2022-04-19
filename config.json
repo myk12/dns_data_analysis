@@ -36,12 +36,15 @@
             "keywords" : "xiaohongshu",
             "res_filename" : "xiaohongshu.csv"
         },
-        "hupu" : {
-            "keywords" : "hupu",
-            "res_filename" : "hupu.csv"
+        "others" : {
+            "keywords" : ".",
+            "res_filename" : "others.csv"
         }
     },
     "raw_data_dir" : "./data/",
     "res_data_dir" : "./result/",
-    "stat_res_filename" : "statistic.csv"
+    "stat_res_filename" : "statistic.csv",
+    "data_compress_type" : "gzip",
+    "data_delimiter" : "|",
+    "data_columns_name" : ["ip", "domain_name", "time", "C3", "C4", "C5", "C6", "C7", "C8"]
 }

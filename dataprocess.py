@@ -1,9 +1,6 @@
 import os
-import gzip
-from pydoc import resolve
 import pandas as pd
 import json
-import re
 
 class preprocessing:
     def __init__(self, datadir = "./data/", outputdir = "./result/"):
@@ -18,45 +15,24 @@ class preprocessing:
 
         # load config json
         with open("config.json", "r", encoding="utf-8") as load_conf:
-            self.websites_conf = json.load(load_conf)["websites"]
+            config_json = json.load(load_conf)
+
+            self.websites_conf = config_json["websites"]
+            self.data_compress_type = config_json["data_compress_type"]
+            self.data_columns_name = config_json["data_columns_name"]
+            self.data_delimiter = config_json["data_delimiter"]
 
             for website, website_info in self.websites_conf.items():
+
                 self.keywords_dict[website] = website_info["keywords"]
-                self.dataframes_dict[website] = pd.DataFrame(columns=['date', 'domain_name'])
+                self.dataframes_dict[website] = pd.DataFrame(columns=['time', 'domain_name'])
                 
                 file_name = self.outputdir + '/' + website_info["res_filename"]
                 self.filenames_dict[website] = file_name
 
                 #create file to save data
                 with open(file_name, "w") as csv_fd:
-                    csv_fd.write("date,domain_name\n")
-
-
-    def process_items(self, item):
-        item_components = item.decode().split("|")
-
-        domain_name = item_components[1]
-        resolve_time = item_components[2]
-
-        for website, name in self.keywords_dict.items():
-            if name in domain_name:
-                it = {}
-                it["date"] = resolve_time[0:10]
-                it["domain_name"] = domain_name
-                
-                self.dataframes_dict[website] = self.dataframes_dict[website].append(pd.Series(it), ignore_index=True)
-
-                # If the match condition is met, exit
-                break
-
-
-    def get_compressed_data(self, filename):
-        #unzip file and read
-        un_file = gzip.GzipFile(filename)
-        file_lines = un_file.readlines()
-
-        for line in file_lines:
-            self.process_items(line)
+                    csv_fd.write("time,domain_name\n")
 
     def save_data(self):
         for website, dataframe in self.dataframes_dict.items():
@@ -64,13 +40,19 @@ class preprocessing:
 
             # empty the dataframe
             dataframe.drop(dataframe.index, inplace=True)
-            #print("data saved.")
+            print("data saved.")
 
-    def readData(self):
+    def process_dataframe(self, df_data):
+        for website, keywords in self.keywords_dict.items():
+            osn_dataframe = df_data[df_data["domain_name"].str.contains(keywords, na = False)]
+
+            # concat
+            self.dataframes_dict[website] = pd.concat([self.dataframes_dict[website], osn_dataframe], ignore_index = True)
+
+    def process_data(self):
         dir_list = os.listdir(self.datadir)
-
-        print(self.datadir)
-
+        dir_list.sort()
+    
         # Walk through all folders in the data_dir directory
         for filedir in dir_list:
             # process data of days
@@ -78,15 +60,20 @@ class preprocessing:
             file_list = os.listdir(file_path)
 
             print("+++ processing datadir :", filedir)
-            for file in file_list:
-                #print("+++ processing file", file)
-                file_lines = self.get_compressed_data(file_path + '/' +  file)
-                self.save_data()
-                #print("--- saved data")
+            dataframe = pd.DataFrame()
 
-    def run(self):
-        self.readData()
+            for file in file_list:
+                # read data from gzip file
+                df = pd.read_csv(file_path + '/' +  file, \
+                                compression = self.data_compress_type, \
+                                delimiter = self.data_delimiter, \
+                                names = self.data_columns_name)[["time","domain_name"]]
+                
+                self.process_dataframe(df)
+            
+            #save data to file
+            self.save_data()
 
 if __name__ == "__main__":
     date_process = preprocessing()
-    date_process.run()
+    date_process.process_data()
