@@ -3,11 +3,13 @@ import pandas as pd
 import json
 
 class preprocessing:
-    def __init__(self, datadir = "./data/", outputdir = "./result/"):
+    def __init__(self, outputdir = "./result/"):
         """
         init context
         """
-        self.datadir = datadir
+        if not os.path.exists(outputdir):
+            os.mkdir(outputdir)
+
         self.outputdir = outputdir
         self.dataframes_dict = {}
         self.keywords_dict = {}
@@ -45,26 +47,24 @@ class preprocessing:
     def process_dataframe(self, df_data):
         for website, keywords in self.keywords_dict.items():
             osn_dataframe = df_data[df_data["domain_name"].str.contains(keywords, na = False)]
+            df_data = df_data.drop(index = osn_dataframe.index)
 
             # concat
             self.dataframes_dict[website] = pd.concat([self.dataframes_dict[website], osn_dataframe], ignore_index = True)
 
-    def process_data(self):
-        dir_list = os.listdir(self.datadir)
-        dir_list.sort()
+    def process_data(self, data_dir_list):
     
         # Walk through all folders in the data_dir directory
-        for filedir in dir_list:
+        for filedir in data_dir_list:
             # process data of days
-            file_path = self.datadir + '/' + filedir
-            file_list = os.listdir(file_path)
+            file_list = os.listdir(filedir)
 
             print("+++ processing datadir :", filedir)
             dataframe = pd.DataFrame()
 
             for file in file_list:
                 # read data from gzip file
-                df = pd.read_csv(file_path + '/' +  file, \
+                df = pd.read_csv(filedir + '/' +  file, \
                                 compression = self.data_compress_type, \
                                 delimiter = self.data_delimiter, \
                                 names = self.data_columns_name)[["time","domain_name"]]
@@ -76,4 +76,4 @@ class preprocessing:
 
 if __name__ == "__main__":
     date_process = preprocessing()
-    date_process.process_data()
+    date_process.process_data(["./data/20220117/"])

@@ -31,14 +31,6 @@
         "zhihu" : {
             "keywords" : "zhihu",
             "res_filename" : "zhihu.csv"
-        },
-        "xiaohongshu" : {
-            "keywords" : "xiaohongshu",
-            "res_filename" : "xiaohongshu.csv"
-        },
-        "others" : {
-            "keywords" : ".",
-            "res_filename" : "others.csv"
         }
     },
     "raw_data_dir" : "./data/",
