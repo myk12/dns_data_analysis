@@ -1,43 +1,75 @@
-!/bin/sh
+#!/bin/sh
 
-data_dir="new-sample"
-res_dir="result"
+# init variable
+top_dir=`pwd`
+data_dir=$top_dir/$1
+res_dir=$top_dir"/output/"
+conf_file=$top_dir"/config"
 
-douyin="ixigua.com.w.kunlunle.com|ixigua.com.v4.tcdnvod.com|pstatp.com.w.alikunlun.com|gslb.ksyuncdn.com|douyin.com.w.kunluncan.com|snssdk.com.w.kunluncan.com|bytecdn.cn.w.kunlunpi.com|bytecdn.cn.w.kunlunhuf.com|v.qingcdn.com|v6-dy.ixigua.com"
+# create workdir and path
+rm -rf $res_dir
+mkdir -p $res_dir
 
-processfile(){
-    fullname=$1
-    filename=$2
-    cp $fullname $filename
+# read osn from config file
+osn_arr=(`awk -F '=' '{print $1}' $conf_file`)
+key_arr=(`awk -F '=' '{print $2}' $conf_file`)
+osn_num=${#osn_arr[*]}
 
-    #unzip file
-    gunzip $filename
-    file=${filename%.*}
+processfiledir(){
+    echo "--- processing datadir : [$2]"
+    src_dir=$1
+    name_dir=$2
 
-    awk -F '|' '/'${douyin}'/{print $2,$3}' $file >> ./data.dat
+    cp -r $src_dir $res_dir
+    cd $res_dir/$name_dir
 
-    #clean
-    rm -rf ${file}
+    for file in `ls`
+    do
+        gunzip $file
+        filename=${file%.*}
+
+        # pattern match
+        for ((i=0; i<osn_num; i++))
+        do
+            awk -F '|' '/'${key_arr[i]}'/{print $2, $3}' $filename >> ${osn_arr[i]}
+        done
+
+        # clean
+        rm -rf $filename
+    done
 }
 
-init_env(){
-
-}
 
 main(){
-    init_env
-    echo "===================== start ====================="
-    date
+    # start log
+    echo "--------------------- data processing start ---------------------"
+    echo "- start time  : "`date`
+    echo "- top dir     : "$top_dir
+    echo "- data dir    : "$data_dir
+    echo "- output dir  : "$res_dir
+    echo "-----------------------------------------------------------------"
+    echo
+
+    # start process data
+    start_time=`date '+%x %T'`
     for dir in `ls ${data_dir}`
     do
-        echo "process datadir [${dir}]"
-        for file in `ls ${data_dir}/${dir}`
-        do
-            processfile "${data_dir}/${dir}/${file}" "${file}"
-        done
+        processfiledir "${data_dir}/${dir}" "${dir}"
     done
-    echo "===================== end  ====================="
-    date
+    end_time=`date '+%x %T'`
+
+    # compress result data
+    cd $top_dir
+    tar -zcf result.tar.gz output
+
+    # result log
+    echo
+    echo "--------------------- data processing complete! ---------------------"
+    echo "- start at : "$start_time
+    echo "- end at   : "$end_time
+    echo "- result data compressed to file : <result.tar.gz>"
+    echo "---------------------------------------------------------------------"
 }
 
+# start data processing
 main
